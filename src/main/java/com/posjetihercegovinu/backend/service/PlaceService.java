@@ -9,7 +9,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.posjetihercegovinu.backend.exception.ResourceNotFoundException;
+import com.posjetihercegovinu.backend.dto.PageResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
+import java.util.Set;
 import java.util.List;
 
 @Service
@@ -30,6 +36,50 @@ public class PlaceService {
                 .map(this::toDto)
                 .toList();
     }
+
+    // Dozvoljena polja za sortiranje. Ako bismo dozvolili bilo sta , klijent bi mogao poslati
+    // sortBy=nesto i dobio bi gresku 500
+    private static final Set<String> SORT_FIELDS = Set.of("name", "price", "createdAt");
+
+    @Transactional(readOnly = true)
+    public PageResponse<PlaceDto> search(String q, Long categoryId,
+                                         int page, int size,String sortBy, String direction){
+
+        // Ako q nije poslat, koristimo prazan tekst(pogadja sve).trim() skida razmake
+        String query = (q == null) ? "" : q.trim();
+
+        // Zastita od losih vrjednosti - stranica ne moze biti negativna
+        // a velicina je izmedji 1 i 50, da neko ne bi trazio veliki broj redova odjednom
+        int safePage = Math.max(page,0);
+        int safeSize = Math.min(Math.max(size,1),50);
+
+        // Ako sortBy nije na listi dozvoljenih, sortiramo po nazivu
+        String safeSortBy = SORT_FIELDS.contains(sortBy) ? sortBy : "name";
+
+        // "desc" - opadajuce (Z-A), sve ostalo rastuce (A-Z)
+        Sort sort = "desc".equalsIgnoreCase(direction) ? Sort.by(safeSortBy).descending() : Sort.by(safeSortBy).ascending();
+
+        // Pageable - koja stranica, koliko stavki , kojim redopsljedom
+        Pageable pageable = PageRequest.of(safePage,safeSize,sort);
+
+        // Pozivamo upit , baza vraca samo traenu sranicu
+        Page<Place> result = placeRepository.search(query,categoryId,pageable);
+
+        // Svako mjesto pretvaramo u DTO i pakujemo u PageResponse
+        return new PageResponse<>(
+                result.getContent().stream().map(this::toDto).toList(),
+                result.getNumber(),
+                result.getSize(),
+                result.getTotalElements(),
+                result.getTotalPages(),
+                result.isLast()
+        );
+
+
+    }
+
+
+
 
     // @Transactiona bez "readOnly" , ovde pisemo u bazu
     @Transactional

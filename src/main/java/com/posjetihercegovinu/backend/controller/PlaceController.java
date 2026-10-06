@@ -1,5 +1,6 @@
 package com.posjetihercegovinu.backend.controller;
 
+import com.posjetihercegovinu.backend.dto.PageResponse;
 import com.posjetihercegovinu.backend.dto.PlaceDto;
 import com.posjetihercegovinu.backend.service.PlaceService;
 import jakarta.validation.Valid;
@@ -16,9 +17,26 @@ public class PlaceController {
 
     private final PlaceService placeService;
 
+//    @GetMapping                              OBRISATI OVU METODU, dva @GetMappinga na istoj putanji ruse aplikaciju
+//    public List<PlaceDto> getAll(){
+//        return placeService.getAll();
+//    }
+
+
+    // GET /api/places?q=most&categoryId=2&page=0&size=10&sortBy=name&direction=asc
+    //@RequestParam - vrijednost iz URL-a poslije znaka "?" ide u parametr metode
+    // required = false - parametar je opcion
+    // defaultValue - sta se koristi ako ga klijent ne posalje
     @GetMapping
-    public List<PlaceDto> getAll(){
-        return placeService.getAll();
+    public PageResponse<PlaceDto> search(
+            @RequestParam(required = false) String q,
+            @RequestParam(required = false) Long categoryId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "name") String sortBy,
+            @RequestParam(defaultValue = "asc") String direction
+    ){
+        return placeService.search(q,categoryId,page,size,sortBy,direction);
     }
 
     // POST api/places : dodavanje novog mjesta
