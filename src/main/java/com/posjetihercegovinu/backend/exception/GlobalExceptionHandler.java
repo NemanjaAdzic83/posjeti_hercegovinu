@@ -67,6 +67,29 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
     }
 
+    // Hvata zauzet email -> odgovro 409 Conflict s jasnom porukom
+    @ExceptionHandler(EmailAlreadyUsedException.class)
+    public ResponseEntity<ErrorResponse> handleEmailUsed(EmailAlreadyUsedException ex){
+        ErrorResponse body = new ErrorResponse(
+                HttpStatus.CONFLICT.value(),
+                HttpStatus.CONFLICT.getReasonPhrase(),
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
+    }
+
+    // Hvata pogresne kredencijale -> odgovor 401 Unauthorized
+    public ResponseEntity<ErrorResponse> handleInvalidCredentials(InvalidCredentialsException ex){
+        ErrorResponse body = new ErrorResponse(
+                HttpStatus.UNAUTHORIZED.value(),
+                HttpStatus.UNAUTHORIZED.getReasonPhrase(),
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(body);
+    }
+
 
 
 }
