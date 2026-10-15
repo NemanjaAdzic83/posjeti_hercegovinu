@@ -35,10 +35,10 @@ public class SecurityConfig {
                 .authorizeHttpRequests( auth -> auth
                         .requestMatchers("/error").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/places/**", "/api/categories/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/places/**", "/api/categories/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/api/places/**", "/api/categories/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/places/**", "/api/categories/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/places/**", "/api/categories/**", "/api/accommodations/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/places/**", "/api/categories/**", "/api/accommodations/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/places/**", "/api/categories/**", "/api/accommodations/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/places/**", "/api/categories/**", "/api/accommodations/**").hasRole("ADMIN")
                         .anyRequest().authenticated())
                 // Nas filter ide prije standardnog filtera za prijavu
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);

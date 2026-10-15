@@ -11,15 +11,15 @@ import java.util.Optional;
 public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     // Sve recenzije jednog mjesta, najnovije prvo
-    List <Review> findByPlaceInOrderByCreatedAtDesc(Long placeId);
+   // List <Review> findByPlaceInOrderByCreatedAtDesc(Long placeId);
 
     // Recenzija odredjenog korisnika za odredjeno mjesto
-    Optional<Review> findByUserIdAndPlaceID(Long userId, Long placeId);
+   // Optional<Review> findByUserIdAndPlaceId(Long userId, Long placeId);
 
     // Prosjecna ocjena mjesta, AVG vraca null ako nema nijedne recenzije
-    @Query("SELECT AVG(r.rating) FROM Review r WHERE r.place.id = :placeId")
-    Double findAverageRating(@Param("place_id") Long placeId);
+  //  @Query("SELECT AVG(r.rating) FROM Review r WHERE r.place.id = :placeId")
+  //  Double findAverageRating(@Param("place_id") Long placeId);
 
     // broj recenzija mjesta
-    long countByPlaceId(Long placeId);
+  //  long countByPlaceId(Long placeId);
 }
